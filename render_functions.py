@@ -1,18 +1,26 @@
-def render_all(con, entities, game_map, root_console, screen_width, screen_height, colors):
+def render_all(con, entities, game_map, fov_recompute, root_console, screen_width, screen_height, colors):
     # Draw all the tiles in the game map
-    for x, y in game_map:
-        wall = not game_map.transparent[x, y]
+    if fov_recompute:
+        for x, y in game_map:
+            wall = not game_map.transparent[x, y]
 
-        if wall:
-            con.draw_char(x, y, None, fg=None, bg=colors.get('dark_wall'))
-        else:
-            con.draw_char(x, y, None, fg=None, bg=colors.get('dark_ground'))
+            if game_map.fov[x, y]:
+                if wall:
+                    con.draw_char(x, y, None, fg=None, bg=colors.get('light_wall'))
+                else:
+                    con.draw_char(x, y, None, fg=None, bg=colors.get('light_ground'))
+            else:
+                if wall:
+                    con.draw_char(x, y, None, fg=None, bg=colors.get('dark_wall'))
+                else:
+                    con.draw_char(x, y, None, fg=None, bg=colors.get('dark_ground'))
 
-    # Draw all entities in the list
-    for entity in entities:
-        draw_entity(con, entity)
 
-    root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0)
+        # Draw all entities in the list
+        for entity in entities:
+            draw_entity(con, entity)
+
+        root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0)
 
 
 def clear_all(con, entities):

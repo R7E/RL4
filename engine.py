@@ -20,9 +20,15 @@ def main():
     room_min_size = 6
     max_rooms = 30
 
+    fov_algorithm = 'BASIC'
+    fov_light_walls = True
+    fov_radius = 10
+
     colors = {
         'dark_wall': (32, 32, 32),
-        'dark_ground': (51, 0, 0)
+        'dark_ground': (51, 0, 0),
+        'light_wall': (130, 110, 50),
+        'light_ground': (200, 180, 50)
     }
 
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255))
@@ -37,12 +43,19 @@ def main():
     game_map = tdl.map.Map(map_width, map_height)
     make_map(game_map, max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
+    fov_recompute = True
+
     while not tdl.event.is_window_closed():
-        render_all(con, entities, game_map, root_console, screen_width, screen_height, colors)
+        if fov_recompute:
+            game_map.compute_fov(player.x, player.y, fov=fov_algorithm, radius=fov_radius, light_walls=fov_light_walls)
+
+        render_all(con, entities, game_map, fov_recompute, root_console, screen_width, screen_height, colors)
 
         tdl.flush()
 
         clear_all(con, entities)
+
+        fov_recompute = False
 
         for event in tdl.event.get():
             if event.type == 'KEYDOWN':
@@ -64,6 +77,8 @@ def main():
             dx, dy = move
             if game_map.walkable[player.x + dx, player.y + dy]:
                 player.move(dx, dy)
+
+                fov_recompute = True    # only recalc FOV when player moves
 
         if exit:
             return True
