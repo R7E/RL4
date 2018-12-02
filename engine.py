@@ -3,7 +3,7 @@ import tdl
 from entity import Entity
 from input_handlers import handle_keys
 from render_functions import clear_all, render_all
-from map_utils import make_map
+from map_utils import GameMap, make_map
 
 # written by Rob
 # from http://rogueliketutorials.com/tdl/1
@@ -40,7 +40,7 @@ def main():
     root_console = tdl.init(screen_width, screen_height, title='The Sorcerer of Doom')
     con = tdl.Console(screen_width, screen_height)
 
-    game_map = tdl.map.Map(map_width, map_height)
+    game_map = GameMap(map_width, map_height)
     make_map(game_map, max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
     fov_recompute = True
