@@ -1,6 +1,10 @@
 from random import randint
 from tdl.map import Map
 from entity import Entity
+from render_functions import RenderOrder
+
+from components.ai import BasicMonster
+from components.fighter import Fighter
 
 
 class GameMap(Map):
@@ -50,7 +54,7 @@ def create_v_tunnel(game_map, y1, y2, x):
 
 
 def place_entities(room, entities, max_monsters_per_room, colors):
-    #get a random number of monsters
+    # get a random number of monsters
     number_of_monsters = randint(0, max_monsters_per_room)
 
     for i in range(number_of_monsters):
@@ -60,9 +64,17 @@ def place_entities(room, entities, max_monsters_per_room, colors):
 
         if not any([entity for entity in entities if entity.x == x and entity.y == y]):
             if randint(0, 100) < 80:
-                monster = Entity(x, y, 'o', colors.get('desaturated_green'), 'Orc', blocks=True)
+                fighter_component = Fighter(hp=10, defense=0, power=3)
+                ai_component = BasicMonster()
+
+                monster = Entity(x, y, 'o', colors.get('desaturated_green'), 'Orc', blocks=True,
+                                 render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
             else:
-                monster = Entity(x, y, 'T', colors.get('darker_green'), 'Troll', blocks=True)
+                fighter_component = Fighter(hp=16, defense=1, power=4)
+                ai_component = BasicMonster()
+
+                monster = Entity(x, y, 'T', colors.get('darker_green'), 'Troll', blocks=True,
+                                 render_order=RenderOrder.ACTOR, fighter=fighter_component, ai=ai_component)
 
             entities.append(monster)
 
@@ -90,7 +102,7 @@ def make_map(game_map, max_rooms, room_min_size, room_max_size, map_width, map_h
         else:
             # this means there are no intersections, so this room is valid
 
-             # "paint" it to the map's tiles
+            # "paint" it to the map's tiles
             create_room(game_map, new_room)
 
             # center coordinates of new room, will be useful later
@@ -113,7 +125,7 @@ def make_map(game_map, max_rooms, room_min_size, room_max_size, map_width, map_h
                     create_h_tunnel(game_map, prev_x, new_x, prev_y)
                     create_v_tunnel(game_map, prev_y, new_y, new_x)
                 else:
-                    #first move vertically, then horizontally
+                    # first move vertically, then horizontally
                     create_v_tunnel(game_map, prev_y, new_y, prev_x)
                     create_h_tunnel(game_map, prev_x, new_x, new_y)
 
