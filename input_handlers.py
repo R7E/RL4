@@ -1,6 +1,8 @@
 def handle_keys(user_input):
     key_char = user_input.char
-
+###
+# I'd like to have the input keys be wasd with mouse pointer for this game
+###
     # Movement keys
     if user_input.key == 'UP' or key_char == 'k':
         return {'move': (0, -1)}
