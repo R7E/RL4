@@ -1,4 +1,6 @@
 from enum import Enum
+from game_states import GameStates
+from menus import inventory_menu
 
 
 class RenderOrder(Enum):
@@ -36,7 +38,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
 
 def render_all(con, panel, entities, player, game_map, fov_recompute, root_console, message_log, screen_width,
-               screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors):
+               screen_height, bar_width, panel_height, panel_y, mouse_coordinates, colors, game_state):
     # Draw all the tiles in the game map
     if fov_recompute:
         for x, y in game_map:
@@ -61,6 +63,10 @@ def render_all(con, panel, entities, player, game_map, fov_recompute, root_conso
     for entity in entities_in_render_order:
         draw_entity(con, entity, game_map.fov)
 
+    #
+    # con.draw_str(1, screen_height - 2, 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp))
+    # I have this code someplace else
+
     root_console.blit(con, 0, 0, screen_width, screen_height, 0, 0)
 
     panel.clear(fg=colors.get('white'), bg=colors.get('black'))
@@ -77,6 +83,14 @@ def render_all(con, panel, entities, player, game_map, fov_recompute, root_conso
     panel.draw_str(1, 0, get_names_under_mouse(mouse_coordinates, entities, game_map))
 
     root_console.blit(panel, 0, panel_y, screen_width, panel_height, 0, 0)
+
+    if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+        if game_state == GameStates.SHOW_INVENTORY:
+            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+        else:
+            inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
+
+        inventory_menu(con, root_console, inventory_title, player.inventory, 50, screen_width, screen_height)
 
 
 def clear_all(con, entities):
